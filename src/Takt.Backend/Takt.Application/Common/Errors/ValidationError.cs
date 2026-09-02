@@ -1,14 +1,24 @@
 using FluentResults;
+using FluentValidation.Results;
 
 namespace Takt.Application.Common.Errors;
 
 public sealed class ValidationError : Error
 {
-    public ValidationError(IReadOnlyDictionary<string, string[]> failures)
+    private ValidationError(IReadOnlyDictionary<string, string[]> failures)
         : base("One or more validation errors occurred.")
     {
         Failures = failures;
     }
 
     public IReadOnlyDictionary<string, string[]> Failures { get; }
+
+    public static ValidationError FromValidationResult(ValidationResult result)
+    {
+        var failures = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+
+        return new ValidationError(failures);
+    }
 }
