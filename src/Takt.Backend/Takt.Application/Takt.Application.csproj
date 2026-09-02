@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="FluentResults" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Takt.Domain\Takt.Domain.csproj" />
   </ItemGroup>
 
