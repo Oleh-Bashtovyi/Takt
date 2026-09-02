@@ -10,6 +10,45 @@ services:
       - "1433:1433"
     volumes:
       - takt_mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' -b"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  migrator:
+    build:
+      context: ./src/Takt.Backend
+      dockerfile: Takt.DbMigrator/Dockerfile
+    profiles: ["apps"]
+    restart: "no"
+    command: ["--seed"]
+    environment:
+      ConnectionStrings__Default: "Server=db;Database=Takt;User Id=sa;Password=Takt_local_Passw0rd!;TrustServerCertificate=True;Encrypt=False"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ./src/Takt.Backend
+      dockerfile: Dockerfile
+    profiles: ["apps"]
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__Default: "Server=db;Database=Takt;User Id=sa;Password=Takt_local_Passw0rd!;TrustServerCertificate=True;Encrypt=False"
+      Jwt__Secret: "takt-compose-development-signing-key-change-me"
+      Cors__AllowedOrigins__0: "http://localhost:4200"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
 
 volumes:
   takt_mssql_data:

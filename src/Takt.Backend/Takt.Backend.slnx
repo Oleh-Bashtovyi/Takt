@@ -3,4 +3,5 @@
   <Project Path="Takt.Application/Takt.Application.csproj" />
   <Project Path="Takt.Infrastructure/Takt.Infrastructure.csproj" />
   <Project Path="Takt.API/Takt.API.csproj" />
+  <Project Path="Takt.DbMigrator/Takt.DbMigrator.csproj" />
 </Solution>

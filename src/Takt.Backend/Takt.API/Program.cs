@@ -4,6 +4,16 @@ using Takt.API.Middleware;
 using Takt.Application;
 using Takt.Infrastructure;
 
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development)
+{
+    var envFile = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+
+    if (File.Exists(envFile))
+    {
+        DotNetEnv.Env.NoClobber().Load(envFile);
+    }
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, configuration) =>

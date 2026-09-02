@@ -13,7 +13,7 @@ namespace Takt.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("Default")
             ?? throw new InvalidOperationException("Connection string 'Default' is not configured.");
@@ -36,17 +36,25 @@ public static class DependencyInjection
             })
             .AddEntityFrameworkStores<AppDbContext>();
 
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+        services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddPersistence(configuration);
+
         services.AddOptions<JwtOptions>()
             .Bind(configuration.GetSection(JwtOptions.SectionName))
             .Validate(o => !string.IsNullOrWhiteSpace(o.Secret) && o.Secret.Length >= 32, "Jwt:Secret must be at least 32 characters.")
             .ValidateOnStart();
 
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ITokenService, TokenService>();
-
-        services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
         return services;
     }
