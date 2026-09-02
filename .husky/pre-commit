@@ -1,0 +1,2 @@
+npx lint-staged
+dotnet build src/Takt.Backend/Takt.Backend.slnx --nologo
