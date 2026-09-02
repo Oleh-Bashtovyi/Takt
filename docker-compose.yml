@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: takt-db
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Takt_local_Passw0rd!"
+    ports:
+      - "1433:1433"
+    volumes:
+      - takt_mssql_data:/var/opt/mssql
+
+volumes:
+  takt_mssql_data:
