@@ -13,6 +13,9 @@ public sealed class ValidationError : Error
 
     public IReadOnlyDictionary<string, string[]> Failures { get; }
 
+    public IDictionary<string, string[]> ToDictionary() =>
+        Failures.ToDictionary(x => x.Key, x => x.Value);
+
     public static ValidationError FromValidationResult(ValidationResult result)
     {
         var failures = result.Errors
