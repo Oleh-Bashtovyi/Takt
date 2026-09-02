@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/.idea/
+**/node_modules/
+**/dist/
+**/*.user
+**/.git/
+**/.github/
+**/.env
+**/.env.*
+.claude/
+.playwright-mcp/
+.husky/
