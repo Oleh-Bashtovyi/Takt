@@ -29,7 +29,9 @@ internal sealed class CategoryService(
     {
         var category = await repository.GetByIdAsync(id, currentUser.Id, ct);
         if (category is null)
+        {
             return Result.Fail<CategoryResponse>(new NotFoundError($"Category '{id}' was not found."));
+        }
 
         var count = await repository.CountTasksAsync(id, ct);
         return Result.Ok(category.ToResponse(count));
@@ -39,13 +41,17 @@ internal sealed class CategoryService(
     {
         var validation = await createValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
+        {
             return Result.Fail<CategoryResponse>(ValidationError.FromValidationResult(validation));
+        }
 
         var userId = currentUser.Id;
         var name = request.Name.Trim();
 
         if (await repository.NameExistsAsync(userId, name, null, ct))
+        {
             return Result.Fail<CategoryResponse>(new ConflictError($"A category named '{name}' already exists."));
+        }
 
         var category = Category.Create(userId, name);
         await repository.AddAsync(category, ct);
@@ -58,16 +64,22 @@ internal sealed class CategoryService(
     {
         var validation = await updateValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
+        {
             return Result.Fail<CategoryResponse>(ValidationError.FromValidationResult(validation));
+        }
 
         var userId = currentUser.Id;
         var category = await repository.GetByIdAsync(id, userId, ct);
         if (category is null)
+        {
             return Result.Fail<CategoryResponse>(new NotFoundError($"Category '{id}' was not found."));
+        }
 
         var name = request.Name.Trim();
         if (await repository.NameExistsAsync(userId, name, id, ct))
+        {
             return Result.Fail<CategoryResponse>(new ConflictError($"A category named '{name}' already exists."));
+        }
 
         category.Rename(name);
         await repository.SaveChangesAsync(ct);
@@ -80,7 +92,9 @@ internal sealed class CategoryService(
     {
         var category = await repository.GetByIdAsync(id, currentUser.Id, ct);
         if (category is null)
+        {
             return Result.Fail(new NotFoundError($"Category '{id}' was not found."));
+        }
 
         repository.Remove(category);
         await repository.SaveChangesAsync(ct);

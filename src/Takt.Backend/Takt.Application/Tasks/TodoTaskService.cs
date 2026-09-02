@@ -30,23 +30,29 @@ internal sealed class TodoTaskService(
     public async Task<Result<TaskResponse>> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var task = await repository.GetByIdAsync(id, currentUser.Id, ct);
+        if (task is null)
+        {
+            return Result.Fail<TaskResponse>(new NotFoundError($"Task '{id}' was not found."));
+        }
 
-        return task is null
-            ? Result.Fail<TaskResponse>(new NotFoundError($"Task '{id}' was not found."))
-            : Result.Ok(task.ToResponse());
+        return Result.Ok(task.ToResponse());
     }
 
     public async Task<Result<TaskResponse>> CreateAsync(CreateTaskRequest request, CancellationToken ct)
     {
         var validation = await createValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
+        {
             return Result.Fail<TaskResponse>(ValidationError.FromValidationResult(validation));
+        }
 
         var userId = currentUser.Id;
 
         var categoryError = await ValidateCategoryAsync(request.CategoryId, userId, ct);
         if (categoryError is not null)
+        {
             return Result.Fail<TaskResponse>(categoryError);
+        }
 
         var task = TodoTask.Create(
             userId,
@@ -60,23 +66,30 @@ internal sealed class TodoTaskService(
         await repository.AddAsync(task, ct);
         await repository.SaveChangesAsync(ct);
 
-        return Result.Ok((await repository.GetByIdAsync(task.Id, userId, ct))!.ToResponse());
+        var created = await repository.GetByIdAsync(task.Id, userId, ct);
+        return Result.Ok(created!.ToResponse());
     }
 
     public async Task<Result<TaskResponse>> UpdateAsync(Guid id, UpdateTaskRequest request, CancellationToken ct)
     {
         var validation = await updateValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
+        {
             return Result.Fail<TaskResponse>(ValidationError.FromValidationResult(validation));
+        }
 
         var userId = currentUser.Id;
         var task = await repository.GetByIdAsync(id, userId, ct);
         if (task is null)
+        {
             return Result.Fail<TaskResponse>(new NotFoundError($"Task '{id}' was not found."));
+        }
 
         var categoryError = await ValidateCategoryAsync(request.CategoryId, userId, ct);
         if (categoryError is not null)
+        {
             return Result.Fail<TaskResponse>(categoryError);
+        }
 
         task.Update(
             request.Title.Trim(),
@@ -87,19 +100,24 @@ internal sealed class TodoTaskService(
         task.ChangeStatus(request.Status);
         await repository.SaveChangesAsync(ct);
 
-        return Result.Ok((await repository.GetByIdAsync(id, userId, ct))!.ToResponse());
+        var updated = await repository.GetByIdAsync(id, userId, ct);
+        return Result.Ok(updated!.ToResponse());
     }
 
     public async Task<Result<TaskResponse>> UpdateStatusAsync(Guid id, UpdateTaskStatusRequest request, CancellationToken ct)
     {
         var validation = await statusValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
+        {
             return Result.Fail<TaskResponse>(ValidationError.FromValidationResult(validation));
+        }
 
         var userId = currentUser.Id;
         var task = await repository.GetByIdAsync(id, userId, ct);
         if (task is null)
+        {
             return Result.Fail<TaskResponse>(new NotFoundError($"Task '{id}' was not found."));
+        }
 
         task.ChangeStatus(request.Status);
         await repository.SaveChangesAsync(ct);
@@ -111,7 +129,9 @@ internal sealed class TodoTaskService(
     {
         var task = await repository.GetByIdAsync(id, currentUser.Id, ct);
         if (task is null)
+        {
             return Result.Fail(new NotFoundError($"Task '{id}' was not found."));
+        }
 
         repository.Remove(task);
         await repository.SaveChangesAsync(ct);
@@ -122,11 +142,16 @@ internal sealed class TodoTaskService(
     private async Task<NotFoundError?> ValidateCategoryAsync(Guid? categoryId, Guid userId, CancellationToken ct)
     {
         if (categoryId is null)
+        {
             return null;
+        }
 
         var category = await categoryRepository.GetByIdAsync(categoryId.Value, userId, ct);
-        return category is null
-            ? new NotFoundError($"Category '{categoryId}' was not found.")
-            : null;
+        if (category is null)
+        {
+            return new NotFoundError($"Category '{categoryId}' was not found.");
+        }
+
+        return null;
     }
 }
