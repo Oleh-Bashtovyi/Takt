@@ -1,0 +1,6 @@
+@Takt.API_HostAddress = http://localhost:5189
+
+GET {{Takt.API_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+###
