@@ -46,6 +46,8 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ITokenService, TokenService>();
 
+        services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
+
         return services;
     }
 }
