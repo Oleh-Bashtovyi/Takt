@@ -9,6 +9,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<TodoTask> Tasks => Set<TodoTask>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
