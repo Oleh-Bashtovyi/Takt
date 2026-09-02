@@ -12,6 +12,8 @@ public interface ICategoryRepository
 
     Task<IReadOnlyDictionary<Guid, int>> GetTaskCountsByCategoryAsync(Guid userId, CancellationToken ct);
 
+    Task<int> CountTasksAsync(Guid categoryId, CancellationToken ct);
+
     Task AddAsync(Category category, CancellationToken ct);
 
     void Remove(Category category);
