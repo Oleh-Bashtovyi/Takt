@@ -21,4 +21,7 @@ public sealed class ValidationError : Error
 
         return new ValidationError(failures);
     }
+
+    public static ValidationError FromFailures(IReadOnlyDictionary<string, string[]> failures) =>
+        new(failures);
 }
