@@ -1,6 +1,60 @@
-@Takt.API_HostAddress = http://localhost:5189
+@host = http://localhost:5189
 
-GET {{Takt.API_HostAddress}}/swagger/v1/swagger.json
-Accept: application/json
+### Register
+# @name register
+POST {{host}}/api/auth/register
+Content-Type: application/json
 
-###
+{ "email": "user@takt.local", "password": "Password1", "displayName": "User" }
+
+### Login
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "user@takt.local", "password": "Password1" }
+
+@access = {{login.response.body.accessToken}}
+@refresh = {{login.response.body.refreshToken}}
+
+### Current user
+GET {{host}}/api/auth/me
+Authorization: Bearer {{access}}
+
+### Create category
+# @name createCategory
+POST {{host}}/api/categories
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{ "name": "Work" }
+
+@categoryId = {{createCategory.response.body.id}}
+
+### List categories
+GET {{host}}/api/categories
+Authorization: Bearer {{access}}
+
+### Create task
+POST {{host}}/api/tasks
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{ "title": "Write the report", "priority": "High", "categoryId": "{{categoryId}}" }
+
+### List tasks (paged, filtered, sorted)
+GET {{host}}/api/tasks?page=1&pageSize=20&search=report&status=Todo&sortBy=Priority&sortDescending=true
+Authorization: Bearer {{access}}
+
+### Refresh
+POST {{host}}/api/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{refresh}}" }
+
+### Logout
+POST {{host}}/api/auth/logout
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{ "refreshToken": "{{refresh}}" }
