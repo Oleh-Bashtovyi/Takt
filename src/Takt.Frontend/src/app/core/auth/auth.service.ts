@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
+import { API_ENDPOINTS } from '../../constants/api.constants';
 import { environment } from '../../../environments/environment';
 
 export interface AuthUser {
@@ -55,14 +56,16 @@ export class AuthService {
   }
 
   register(payload: RegisterPayload): Observable<void> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, payload).pipe(
-      tap((response) => this.persist(response)),
-      map(() => undefined),
-    );
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}${API_ENDPOINTS.auth.register}`, payload)
+      .pipe(
+        tap((response) => this.persist(response)),
+        map(() => undefined),
+      );
   }
 
   login(payload: LoginPayload): Observable<void> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, payload).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}${API_ENDPOINTS.auth.login}`, payload).pipe(
       tap((response) => this.persist(response)),
       map(() => undefined),
     );
@@ -76,7 +79,9 @@ export class AuthService {
     }
 
     return this.http
-      .post<void>(`${this.baseUrl}/auth/logout`, { refreshToken: current.refreshToken })
+      .post<void>(`${this.baseUrl}${API_ENDPOINTS.auth.logout}`, {
+        refreshToken: current.refreshToken,
+      })
       .pipe(
         catchError(() => of(undefined)),
         tap(() => this.clear()),
@@ -101,7 +106,9 @@ export class AuthService {
     }
 
     return this.http
-      .post<AuthResponse>(`${this.baseUrl}/auth/refresh`, { refreshToken: current.refreshToken })
+      .post<AuthResponse>(`${this.baseUrl}${API_ENDPOINTS.auth.refresh}`, {
+        refreshToken: current.refreshToken,
+      })
       .pipe(
         tap((response) => this.persist(response)),
         map(() => undefined),
