@@ -1,11 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Icon } from '../../shared/components/icon/icon';
+import { TaskComposer } from './task-composer/task-composer';
 import { TaskRow } from './task-row/task-row';
 import { TasksService } from './tasks.service';
 
 @Component({
   selector: 'app-tasks-page',
-  imports: [TaskRow, Icon],
+  imports: [TaskComposer, TaskRow, Icon],
   templateUrl: './tasks-page.html',
 })
 export class TasksPage {

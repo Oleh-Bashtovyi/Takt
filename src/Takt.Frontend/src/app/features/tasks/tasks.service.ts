@@ -1,5 +1,6 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 import { API_ENDPOINTS } from '../../constants/api.constants';
 import { environment } from '../../../environments/environment';
 import { NotificationService } from '../../core/notifications/notification.service';
@@ -41,6 +42,18 @@ export class TasksService {
     url: this.baseUrl,
     params: { sortBy: 'Priority', sortDescending: true },
   }));
+
+  create(title: string): Observable<Task> {
+    return this.http
+      .post<Task>(this.baseUrl, {
+        title,
+        description: null,
+        priority: null,
+        dueDateUtc: null,
+        categoryId: null,
+      })
+      .pipe(tap(() => this.tasks.reload()));
+  }
 
   setCompleted(id: string, isCompleted: boolean): void {
     if (this.pending.has(id)) {

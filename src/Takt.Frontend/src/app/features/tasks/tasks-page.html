@@ -1,7 +1,9 @@
 <main class="mx-auto max-w-3xl px-4 py-8">
   <h1 class="text-xl font-semibold text-gray-900">Tasks</h1>
 
-  @if (tasks.isLoading()) {
+  <app-task-composer class="mt-6 block" />
+
+  @if (tasks.isLoading() && !tasks.hasValue()) {
     <p class="mt-6 text-sm text-gray-500">Loading…</p>
   } @else if (tasks.error()) {
     <div class="mt-6 flex flex-col items-start gap-2">
