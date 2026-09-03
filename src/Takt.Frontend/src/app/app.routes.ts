@@ -19,6 +19,10 @@ export const routes: Routes = [
   {
     path: 'app',
     canActivateChild: [authGuard],
+    loadComponent: () =>
+      import('./shared/components/workspace-layout/workspace-layout').then(
+        (m) => m.WorkspaceLayout,
+      ),
     children: [
       {
         path: '',

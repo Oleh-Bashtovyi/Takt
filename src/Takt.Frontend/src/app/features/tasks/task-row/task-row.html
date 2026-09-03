@@ -1,0 +1,45 @@
+<div
+  class="flex items-center gap-3 rounded-md border border-gray-200 border-l-4 bg-white px-4 py-3"
+  [class]="accent[task().priority]"
+>
+  <button
+    type="button"
+    class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-white transition"
+    [class.border-gray-300]="!task().isCompleted"
+    [class.hover:border-gray-500]="!task().isCompleted"
+    [class.border-gray-900]="task().isCompleted"
+    [class.bg-gray-900]="task().isCompleted"
+    [attr.aria-pressed]="task().isCompleted"
+    [attr.aria-label]="task().isCompleted ? 'Mark as not done' : 'Mark as done'"
+    (click)="toggleCompleted.emit(!task().isCompleted)"
+  >
+    @if (task().isCompleted) {
+      <app-icon name="check" [size]="12" />
+    }
+  </button>
+
+  <span
+    class="flex-1 text-sm text-gray-900"
+    [class.text-gray-400]="task().isCompleted"
+    [class.line-through]="task().isCompleted"
+  >
+    {{ task().title }}
+  </span>
+
+  @if (task().categoryName) {
+    <span class="shrink-0 text-xs text-gray-400">{{ task().categoryName }}</span>
+  }
+
+  @if (task().dueDateUtc; as due) {
+    <span
+      class="flex shrink-0 items-center gap-1 text-xs"
+      [class.text-red-600]="overdue()"
+      [class.text-gray-500]="!overdue()"
+    >
+      @if (overdue()) {
+        <app-icon name="warning" [size]="14" />
+      }
+      {{ due | date: 'MMM d' }}
+    </span>
+  }
+</div>

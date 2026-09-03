@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -6,4 +6,6 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   templateUrl: './logo-group.html',
 })
-export class LogoGroup {}
+export class LogoGroup {
+  readonly link = input('/');
+}
