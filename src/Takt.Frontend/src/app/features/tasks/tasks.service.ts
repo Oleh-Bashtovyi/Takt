@@ -1,9 +1,10 @@
 import { HttpClient, httpResource } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { API_ENDPOINTS } from '../../constants/api.constants';
 import { environment } from '../../../environments/environment';
 import { NotificationService } from '../../core/notifications/notification.service';
+import { CategoriesService } from '../categories/categories.service';
 
 export type TaskPriority = 'Low' | 'Medium' | 'High';
 
@@ -35,13 +36,23 @@ export interface PagedTasks {
 export class TasksService {
   private readonly http = inject(HttpClient);
   private readonly notifications = inject(NotificationService);
+  private readonly categoriesService = inject(CategoriesService);
   private readonly baseUrl = `${environment.apiBaseUrl}${API_ENDPOINTS.tasks}`;
   private readonly pending = new Set<string>();
 
-  readonly tasks = httpResource<PagedTasks>(() => ({
-    url: this.baseUrl,
-    params: { sortBy: 'Priority', sortDescending: true },
-  }));
+  readonly categoryId = signal<string | null>(null);
+
+  readonly tasks = httpResource<PagedTasks>(() => {
+    const params: Record<string, string | boolean> = {
+      sortBy: 'Priority',
+      sortDescending: true,
+    };
+    const categoryId = this.categoryId();
+    if (categoryId) {
+      params['categoryId'] = categoryId;
+    }
+    return { url: this.baseUrl, params };
+  });
 
   create(title: string): Observable<Task> {
     return this.http
@@ -50,9 +61,14 @@ export class TasksService {
         description: null,
         priority: null,
         dueDateUtc: null,
-        categoryId: null,
+        categoryId: this.categoryId(),
       })
-      .pipe(tap(() => this.tasks.reload()));
+      .pipe(
+        tap(() => {
+          this.tasks.reload();
+          this.categoriesService.categories.reload();
+        }),
+      );
   }
 
   setCompleted(id: string, isCompleted: boolean): void {

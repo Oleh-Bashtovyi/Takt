@@ -16,9 +16,14 @@ const PRIORITY_ACCENT: Record<TaskPriority, string> = {
 })
 export class TaskRow {
   readonly task = input.required<Task>();
+  readonly activeCategoryId = input<string | null>(null);
   readonly toggleCompleted = output<boolean>();
 
   protected readonly accent = PRIORITY_ACCENT;
+
+  protected readonly showCategory = computed(
+    () => this.task().categoryName !== null && this.task().categoryId !== this.activeCategoryId(),
+  );
 
   protected readonly overdue = computed(() => {
     const task = this.task();

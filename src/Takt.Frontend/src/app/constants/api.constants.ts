@@ -6,4 +6,5 @@ export const API_ENDPOINTS = {
     logout: '/auth/logout',
   },
   tasks: '/tasks',
+  categories: '/categories',
 } as const;

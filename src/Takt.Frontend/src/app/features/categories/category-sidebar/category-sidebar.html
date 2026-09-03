@@ -1,0 +1,34 @@
+<nav class="flex-1 border-r border-gray-200 bg-white p-3">
+  <a
+    routerLink="/app"
+    [queryParams]="{ categoryId: null }"
+    queryParamsHandling="merge"
+    class="block rounded-md px-3 py-2 text-sm"
+    [class.bg-gray-100]="!activeCategoryId()"
+    [class.font-medium]="!activeCategoryId()"
+    [class.text-gray-900]="!activeCategoryId()"
+    [class.text-gray-600]="activeCategoryId()"
+  >
+    All tasks
+  </a>
+
+  @if (categories.error()) {
+    <p class="px-3 py-2 text-xs text-red-600">Couldn't load categories</p>
+  }
+
+  @for (category of categories.value() ?? []; track category.id) {
+    <a
+      routerLink="/app"
+      [queryParams]="{ categoryId: category.id }"
+      queryParamsHandling="merge"
+      class="mt-0.5 flex items-center justify-between rounded-md px-3 py-2 text-sm"
+      [class.bg-gray-100]="activeCategoryId() === category.id"
+      [class.font-medium]="activeCategoryId() === category.id"
+      [class.text-gray-900]="activeCategoryId() === category.id"
+      [class.text-gray-600]="activeCategoryId() !== category.id"
+    >
+      <span class="truncate">{{ category.name }}</span>
+      <span class="ml-2 shrink-0 text-xs text-gray-400">{{ category.taskCount }}</span>
+    </a>
+  }
+</nav>
