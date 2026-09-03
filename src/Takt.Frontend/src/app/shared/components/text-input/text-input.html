@@ -1,0 +1,25 @@
+<div class="flex flex-col gap-1.5">
+  @if (label(); as label) {
+    <label [for]="id" class="text-sm font-medium text-gray-700">{{ label }}</label>
+  }
+  <input
+    [id]="id"
+    [class]="fieldClass"
+    [formControl]="control()"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [attr.autocomplete]="autocomplete()"
+    [attr.aria-invalid]="invalid"
+  />
+  <p class="min-h-[16px] text-xs text-red-600">
+    @if (invalid && control().errors; as errors) {
+      @if (errors['required']) {
+        This field is required
+      } @else if (errors['email']) {
+        Enter a valid email address
+      } @else if (errors['maxlength']) {
+        Must be at most {{ errors['maxlength'].requiredLength }} characters
+      }
+    }
+  </p>
+</div>

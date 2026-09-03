@@ -1,0 +1,44 @@
+<app-auth-card title="Create your account" subtitle="Start organising your tasks with Takt">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-3">
+    <app-text-input
+      [control]="form.controls.displayName"
+      label="Display name (optional)"
+      autocomplete="name"
+      placeholder="Ada Lovelace"
+    />
+    <app-text-input
+      [control]="form.controls.email"
+      label="Email"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+    />
+    <app-password-input
+      [control]="form.controls.password"
+      label="Password"
+      autocomplete="new-password"
+      hint="At least 8 characters"
+    />
+    <div>
+      <app-password-input
+        [control]="form.controls.confirmPassword"
+        label="Confirm password"
+        autocomplete="new-password"
+      />
+      @if (form.controls.confirmPassword.touched && form.hasError('passwordsMismatch')) {
+        <p class="text-xs text-red-600">Passwords do not match</p>
+      }
+    </div>
+    <button
+      type="submit"
+      class="mt-2 w-full rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700"
+    >
+      Create account
+    </button>
+  </form>
+
+  <p class="mt-6 text-center text-sm text-gray-500">
+    Already have an account?
+    <a [routerLink]="routes.login" class="font-medium text-gray-900 hover:underline">Log in</a>
+  </p>
+</app-auth-card>
