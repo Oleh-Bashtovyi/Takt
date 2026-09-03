@@ -9,17 +9,26 @@
     more than you need.
   </p>
   <div class="mt-10 flex gap-4">
-    <a
-      [routerLink]="routes.register"
-      class="rounded-md bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700"
-    >
-      Get started
-    </a>
-    <a
-      [routerLink]="routes.login"
-      class="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100"
-    >
-      Log in
-    </a>
+    @if (isAuthenticated()) {
+      <a
+        [routerLink]="routes.tasks"
+        class="rounded-md bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700"
+      >
+        Go to workspace
+      </a>
+    } @else {
+      <a
+        [routerLink]="routes.register"
+        class="rounded-md bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700"
+      >
+        Get started
+      </a>
+      <a
+        [routerLink]="routes.login"
+        class="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100"
+      >
+        Log in
+      </a>
+    }
   </div>
 </section>
