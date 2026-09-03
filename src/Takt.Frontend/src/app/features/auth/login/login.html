@@ -1,5 +1,9 @@
 <app-auth-card title="Welcome back" subtitle="Log in to your Takt account">
   <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-3">
+    @if (formError(); as error) {
+      <p class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>
+    }
+
     <app-text-input
       [control]="form.controls.email"
       label="Email"
@@ -14,9 +18,10 @@
     />
     <button
       type="submit"
-      class="mt-2 w-full rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700"
+      [disabled]="submitting()"
+      class="mt-2 w-full rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700 disabled:opacity-60"
     >
-      Log in
+      {{ submitting() ? 'Logging in…' : 'Log in' }}
     </button>
   </form>
 

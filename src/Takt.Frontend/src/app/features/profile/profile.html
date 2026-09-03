@@ -1,0 +1,26 @@
+<app-header />
+
+<section class="mx-auto max-w-md px-4 py-16">
+  <h1 class="text-2xl font-bold text-gray-900">Profile</h1>
+
+  @if (user(); as user) {
+    <dl class="mt-8 space-y-4">
+      <div>
+        <dt class="text-sm text-gray-500">Display name</dt>
+        <dd class="text-sm font-medium text-gray-900">{{ user.displayName || '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-gray-500">Email</dt>
+        <dd class="text-sm font-medium text-gray-900">{{ user.email }}</dd>
+      </div>
+    </dl>
+  }
+
+  <button
+    type="button"
+    (click)="logout()"
+    class="mt-8 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100"
+  >
+    Log out
+  </button>
+</section>
