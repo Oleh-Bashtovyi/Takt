@@ -4,14 +4,47 @@
 # Local secrets — copy .env.example to .env and fill it in
 .env
 
-# Claude Code local session artifacts
-.claude/
+# Claude Code — commit shared settings, keep machine-local overrides out
+.claude/settings.local.json
 
 # Assignment brief (kept local; requirements live in README)
 TASK.txt
 
 # Playwright MCP tool session artifacts (snapshots/console logs written to the repo root)
 .playwright-mcp/
+
+### Angular ###
+## Angular ##
+# compiled output
+dist/
+tmp/
+app/**/*.js
+app/**/*.js.map
+
+# dependencies
+node_modules/
+bower_components/
+
+# IDEs and editors
+.idea/
+
+# misc
+.sass-cache/
+connect.lock/
+coverage/
+libpeerconnection.log/
+npm-debug.log
+testem.log
+typings/
+.angular/
+__screenshots__/
+
+# e2e
+e2e/*.js
+e2e/*.map
+
+# System Files
+.DS_Store/
 
 ### ASPNETCore ###
 ## Ignore Visual Studio temporary files, build results, and
