@@ -10,6 +10,5 @@ public sealed class CreateTaskRequestValidator : AbstractValidator<CreateTaskReq
         RuleFor(x => x.Title).TaskTitle();
         RuleFor(x => x.Description).TaskDescription();
         RuleFor(x => x.Priority!.Value).IsInEnum().When(x => x.Priority.HasValue);
-        RuleFor(x => x.Status!.Value).IsInEnum().When(x => x.Status.HasValue);
     }
 }

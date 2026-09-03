@@ -7,13 +7,14 @@ public class TodoTask : BaseEntity
 {
     public string Title { get; private set; } = null!;
     public string? Description { get; private set; }
-    public TodoStatus Status { get; private set; }
     public TaskPriority Priority { get; private set; }
     public DateTime? DueDateUtc { get; private set; }
     public Guid? CategoryId { get; private set; }
     public Category? Category { get; private set; }
     public Guid UserId { get; private set; }
     public DateTime? CompletedAtUtc { get; private set; }
+
+    public bool IsCompleted => CompletedAtUtc is not null;
 
     private TodoTask() { }
 
@@ -23,10 +24,9 @@ public class TodoTask : BaseEntity
         string? description,
         TaskPriority priority,
         DateTime? dueDateUtc,
-        Guid? categoryId,
-        TodoStatus status)
+        Guid? categoryId)
     {
-        var task = new TodoTask
+        return new TodoTask
         {
             UserId = userId,
             Title = title,
@@ -35,8 +35,6 @@ public class TodoTask : BaseEntity
             DueDateUtc = dueDateUtc,
             CategoryId = categoryId,
         };
-        task.ChangeStatus(status);
-        return task;
     }
 
     public void Update(
@@ -53,9 +51,8 @@ public class TodoTask : BaseEntity
         CategoryId = categoryId;
     }
 
-    public void ChangeStatus(TodoStatus status)
+    public void SetCompleted(bool completed)
     {
-        Status = status;
-        CompletedAtUtc = status == TodoStatus.Done ? DateTime.UtcNow : null;
+        CompletedAtUtc = completed ? CompletedAtUtc ?? DateTime.UtcNow : null;
     }
 }

@@ -10,7 +10,7 @@ internal static class TaskMappings
             task.Id,
             task.Title,
             task.Description,
-            task.Status,
+            task.IsCompleted,
             task.Priority,
             task.DueDateUtc,
             task.CategoryId,

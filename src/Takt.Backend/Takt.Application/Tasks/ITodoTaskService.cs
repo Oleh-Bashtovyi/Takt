@@ -15,7 +15,7 @@ public interface ITodoTaskService
 
     Task<Result<TaskResponse>> UpdateAsync(Guid id, UpdateTaskRequest request, CancellationToken ct);
 
-    Task<Result<TaskResponse>> UpdateStatusAsync(Guid id, UpdateTaskStatusRequest request, CancellationToken ct);
+    Task<Result<TaskResponse>> UpdateCompletionAsync(Guid id, UpdateTaskCompletionRequest request, CancellationToken ct);
 
     Task<Result> DeleteAsync(Guid id, CancellationToken ct);
 }

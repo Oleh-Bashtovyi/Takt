@@ -16,8 +16,7 @@ internal sealed class TodoTaskService(
     ICategoryRepository categoryRepository,
     ICurrentUser currentUser,
     IValidator<CreateTaskRequest> createValidator,
-    IValidator<UpdateTaskRequest> updateValidator,
-    IValidator<UpdateTaskStatusRequest> statusValidator) : ITodoTaskService
+    IValidator<UpdateTaskRequest> updateValidator) : ITodoTaskService
 {
     public async Task<PaginatedResult<TaskResponse>> GetPagedAsync(TaskQuery query, CancellationToken ct)
     {
@@ -60,8 +59,7 @@ internal sealed class TodoTaskService(
             request.Description?.Trim(),
             request.Priority ?? TaskPriority.Medium,
             request.DueDateUtc,
-            request.CategoryId,
-            request.Status ?? TodoStatus.Todo);
+            request.CategoryId);
 
         await repository.AddAsync(task, ct);
         await repository.SaveChangesAsync(ct);
@@ -97,21 +95,14 @@ internal sealed class TodoTaskService(
             request.Priority,
             request.DueDateUtc,
             request.CategoryId);
-        task.ChangeStatus(request.Status);
         await repository.SaveChangesAsync(ct);
 
         var updated = await repository.GetByIdAsync(id, userId, ct);
         return Result.Ok(updated!.ToResponse());
     }
 
-    public async Task<Result<TaskResponse>> UpdateStatusAsync(Guid id, UpdateTaskStatusRequest request, CancellationToken ct)
+    public async Task<Result<TaskResponse>> UpdateCompletionAsync(Guid id, UpdateTaskCompletionRequest request, CancellationToken ct)
     {
-        var validation = await statusValidator.ValidateAsync(request, ct);
-        if (!validation.IsValid)
-        {
-            return Result.Fail<TaskResponse>(ValidationError.FromValidationResult(validation));
-        }
-
         var userId = currentUser.Id;
         var task = await repository.GetByIdAsync(id, userId, ct);
         if (task is null)
@@ -119,7 +110,7 @@ internal sealed class TodoTaskService(
             return Result.Fail<TaskResponse>(new NotFoundError($"Task '{id}' was not found."));
         }
 
-        task.ChangeStatus(request.Status);
+        task.SetCompleted(request.IsCompleted);
         await repository.SaveChangesAsync(ct);
 
         return Result.Ok(task.ToResponse());

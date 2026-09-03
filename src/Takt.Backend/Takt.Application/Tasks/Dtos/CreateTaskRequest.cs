@@ -7,5 +7,4 @@ public sealed record CreateTaskRequest(
     string? Description,
     TaskPriority? Priority,
     DateTime? DueDateUtc,
-    Guid? CategoryId,
-    TodoStatus? Status);
+    Guid? CategoryId);

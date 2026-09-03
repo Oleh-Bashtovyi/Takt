@@ -1,5 +1,4 @@
 using Takt.Domain.Common;
-using Takt.Domain.Enums;
 using Takt.Domain.Tasks;
 
 namespace Takt.API.Contracts;
@@ -10,7 +9,7 @@ public sealed record TaskListQuery
     public int PageSize { get; init; } = PaginationConstants.DefaultPageSize;
     public string? Search { get; init; }
     public Guid? CategoryId { get; init; }
-    public TodoStatus? Status { get; init; }
+    public bool? IsCompleted { get; init; }
     public TaskSortField SortBy { get; init; } = TaskSortField.CreatedAt;
     public bool SortDescending { get; init; } = true;
 
@@ -19,7 +18,7 @@ public sealed record TaskListQuery
         Pagination = new PaginationRequest(Page, PageSize),
         Search = Search,
         CategoryId = CategoryId,
-        Status = Status,
+        IsCompleted = IsCompleted,
         SortBy = SortBy,
         SortDescending = SortDescending
     };

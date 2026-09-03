@@ -18,9 +18,7 @@ internal sealed class TodoTaskConfiguration : IEntityTypeConfiguration<TodoTask>
         builder.Property(t => t.Description)
             .HasMaxLength(TodoTaskConstants.DescriptionMaxLength);
 
-        builder.Property(t => t.Status)
-            .HasConversion<string>()
-            .HasMaxLength(20);
+        builder.Ignore(t => t.IsCompleted);
 
         builder.Property(t => t.Priority)
             .HasConversion<string>()
@@ -36,7 +34,7 @@ internal sealed class TodoTaskConfiguration : IEntityTypeConfiguration<TodoTask>
             .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasIndex(t => new { t.UserId, t.Status });
+        builder.HasIndex(t => new { t.UserId, t.CompletedAtUtc });
         builder.HasIndex(t => new { t.UserId, t.CategoryId });
     }
 }

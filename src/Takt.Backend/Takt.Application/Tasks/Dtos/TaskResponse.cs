@@ -6,7 +6,7 @@ public sealed record TaskResponse(
     Guid Id,
     string Title,
     string? Description,
-    TodoStatus Status,
+    bool IsCompleted,
     TaskPriority Priority,
     DateTime? DueDateUtc,
     Guid? CategoryId,

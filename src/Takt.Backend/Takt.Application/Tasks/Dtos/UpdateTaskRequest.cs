@@ -7,5 +7,4 @@ public sealed record UpdateTaskRequest(
     string? Description,
     TaskPriority Priority,
     DateTime? DueDateUtc,
-    Guid? CategoryId,
-    TodoStatus Status);
+    Guid? CategoryId);

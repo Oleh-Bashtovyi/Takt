@@ -38,10 +38,13 @@ internal sealed class DevDataSeeder(
         var personal = Category.Create(user.Id, "Personal");
         context.Categories.AddRange(work, personal);
 
+        var groceries = TodoTask.Create(user.Id, "Buy groceries", null, TaskPriority.Low, null, personal.Id);
+        groceries.SetCompleted(true);
+
         context.Tasks.AddRange(
-            TodoTask.Create(user.Id, "Write the README", null, TaskPriority.High, null, work.Id, TodoStatus.InProgress),
-            TodoTask.Create(user.Id, "Review the pull request", "Check the auth changes", TaskPriority.Medium, null, work.Id, TodoStatus.Todo),
-            TodoTask.Create(user.Id, "Buy groceries", null, TaskPriority.Low, null, personal.Id, TodoStatus.Todo));
+            TodoTask.Create(user.Id, "Write the README", null, TaskPriority.High, null, work.Id),
+            TodoTask.Create(user.Id, "Review the pull request", "Check the auth changes", TaskPriority.Medium, null, work.Id),
+            groceries);
 
         await context.SaveChangesAsync();
         logger.LogInformation("Seed complete — demo account {Email} / {Password}", DemoEmail, DemoPassword);

@@ -10,6 +10,5 @@ public sealed class UpdateTaskRequestValidator : AbstractValidator<UpdateTaskReq
         RuleFor(x => x.Title).TaskTitle();
         RuleFor(x => x.Description).TaskDescription();
         RuleFor(x => x.Priority).IsInEnum();
-        RuleFor(x => x.Status).IsInEnum();
     }
 }

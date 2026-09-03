@@ -28,9 +28,11 @@ internal sealed class TodoTaskRepository(AppDbContext context) : ITodoTaskReposi
             filtered = filtered.Where(t => t.CategoryId == query.CategoryId);
         }
 
-        if (query.Status is not null)
+        if (query.IsCompleted is not null)
         {
-            filtered = filtered.Where(t => t.Status == query.Status);
+            filtered = query.IsCompleted.Value
+                ? filtered.Where(t => t.CompletedAtUtc != null)
+                : filtered.Where(t => t.CompletedAtUtc == null);
         }
 
         var total = await filtered.LongCountAsync(ct);

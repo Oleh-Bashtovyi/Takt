@@ -50,13 +50,12 @@ public sealed class TasksController(ITodoTaskService taskService) : ControllerBa
         return result.ToActionResult();
     }
 
-    [HttpPatch("{id:guid}/status")]
+    [HttpPatch("{id:guid}/completion")]
     [ProducesResponseType<TaskResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateTaskStatusRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateCompletion(Guid id, [FromBody] UpdateTaskCompletionRequest request, CancellationToken ct)
     {
-        var result = await taskService.UpdateStatusAsync(id, request, ct);
+        var result = await taskService.UpdateCompletionAsync(id, request, ct);
         return result.ToActionResult();
     }
 
