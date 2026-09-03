@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface AuthUser {
@@ -40,10 +40,19 @@ export class AuthService {
   private readonly baseUrl = environment.apiBaseUrl;
 
   private readonly session = signal<Session | null>(readSession());
+  private refreshInFlight?: Observable<void>;
 
   readonly user = computed(() => this.session()?.user ?? null);
   readonly accessToken = computed(() => this.session()?.accessToken ?? null);
   readonly isAuthenticated = computed(() => this.session() !== null);
+
+  /** Runs during app bootstrap: trade the stored refresh token for a fresh session, or boot as guest. */
+  initialize(): Observable<void> {
+    if (!this.session()) {
+      return of(undefined);
+    }
+    return this.refresh().pipe(catchError(() => of(undefined)));
+  }
 
   register(payload: RegisterPayload): Observable<void> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, payload).pipe(
@@ -72,6 +81,37 @@ export class AuthService {
         catchError(() => of(undefined)),
         tap(() => this.clear()),
         map(() => undefined),
+      );
+  }
+
+  /** Rotates the token pair. Concurrent callers share one request. Clears the session on failure. */
+  refresh(): Observable<void> {
+    this.refreshInFlight ??= this.requestRefresh().pipe(
+      finalize(() => (this.refreshInFlight = undefined)),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
+    return this.refreshInFlight;
+  }
+
+  private requestRefresh(): Observable<void> {
+    const current = this.session();
+
+    if (!current) {
+      return throwError(() => new Error('No active session'));
+    }
+
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}/auth/refresh`, { refreshToken: current.refreshToken })
+      .pipe(
+        tap((response) => this.persist(response)),
+        map(() => undefined),
+        catchError((error: HttpErrorResponse) => {
+          // 401 means the refresh token is rejected — log out. Network error or 5xx keeps the session.
+          if (error.status === 401) {
+            this.clear();
+          }
+          return throwError(() => error);
+        }),
       );
   }
 
