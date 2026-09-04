@@ -1,4 +1,4 @@
-<nav class="flex-1 border-r border-gray-200 bg-white p-3">
+<nav class="min-w-0 flex-1 overflow-hidden border-r border-gray-200 bg-white p-3">
   <a
     [routerLink]="routes.tasks"
     [queryParams]="{ categoryId: null }"
@@ -22,6 +22,7 @@
     @if (editingId() === category.id) {
       <input
         [formControl]="editControl"
+        [attr.maxlength]="limits.nameMax"
         (keydown.enter)="saveEdit(category)"
         (blur)="saveEdit(category)"
         (keydown.escape)="editingId.set(null)"
@@ -46,44 +47,51 @@
         </button>
       </div>
     } @else {
-      <div
-        class="group mt-0.5 flex items-center rounded-md pr-1 hover:bg-gray-50"
+      <a
+        [routerLink]="routes.tasks"
+        [queryParams]="{ categoryId: category.id }"
+        queryParamsHandling="merge"
+        (contextmenu)="openMenu($event, category)"
+        class="mt-0.5 flex min-w-0 items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-gray-50"
         [class.bg-gray-100]="activeCategoryId() === category.id"
+        [class.font-medium]="activeCategoryId() === category.id"
+        [class.text-gray-900]="activeCategoryId() === category.id"
+        [class.text-gray-600]="activeCategoryId() !== category.id"
       >
-        <a
-          [routerLink]="routes.tasks"
-          [queryParams]="{ categoryId: category.id }"
-          queryParamsHandling="merge"
-          class="flex min-w-0 flex-1 items-center justify-between rounded-md px-3 py-2 text-sm"
-          [class.font-medium]="activeCategoryId() === category.id"
-          [class.text-gray-900]="activeCategoryId() === category.id"
-          [class.text-gray-600]="activeCategoryId() !== category.id"
-        >
-          <span class="truncate">{{ category.name }}</span>
-          <span class="ml-2 shrink-0 text-xs text-gray-400">{{ category.taskCount }}</span>
-        </a>
-        <button
-          type="button"
-          (click)="startEdit(category)"
-          aria-label="Rename list"
-          class="shrink-0 rounded p-1 text-gray-400 opacity-0 transition hover:text-gray-700 group-hover:opacity-100"
-        >
-          <app-icon name="pencil" [size]="14" />
-        </button>
-        <button
-          type="button"
-          (click)="askDelete(category)"
-          aria-label="Delete list"
-          class="shrink-0 rounded p-1 text-gray-400 opacity-0 transition hover:text-red-600 group-hover:opacity-100"
-        >
-          <app-icon name="trash" [size]="14" />
-        </button>
-      </div>
+        <span [title]="category.name" class="min-w-0 flex-1 truncate">{{ category.name }}</span>
+        <span class="ml-2 shrink-0 text-xs text-gray-400">{{ category.taskCount }}</span>
+      </a>
     }
+  }
+
+  @if (menu(); as pos) {
+    <div
+      class="fixed z-50 min-w-[8rem] rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg"
+      [style.left.px]="pos.x"
+      [style.top.px]="pos.y"
+    >
+      <button
+        type="button"
+        (click)="renameFromMenu()"
+        class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-gray-700 hover:bg-gray-50"
+      >
+        <app-icon name="pencil" [size]="14" />
+        Rename
+      </button>
+      <button
+        type="button"
+        (click)="deleteFromMenu()"
+        class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-red-600 hover:bg-gray-50"
+      >
+        <app-icon name="trash" [size]="14" />
+        Delete
+      </button>
+    </div>
   }
 
   <input
     [formControl]="addControl"
+    [attr.maxlength]="limits.nameMax"
     (keydown.enter)="add()"
     type="text"
     placeholder="New list"

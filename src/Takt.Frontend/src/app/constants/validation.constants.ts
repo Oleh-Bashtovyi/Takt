@@ -8,3 +8,7 @@ export const TASK = {
   titleMax: 200,
   descriptionMax: 2000,
 } as const;
+
+export const CATEGORY = {
+  nameMax: 80,
+} as const;
