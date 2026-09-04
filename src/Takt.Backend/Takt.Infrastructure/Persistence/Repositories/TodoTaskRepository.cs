@@ -17,10 +17,11 @@ internal sealed class TodoTaskRepository(AppDbContext context) : ITodoTaskReposi
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            var term = query.Search.Trim();
+            var term = query.Search.Trim().ToLower();
 
             filtered = filtered.Where(t =>
-                t.Title.Contains(term) || (t.Description != null && t.Description.Contains(term)));
+                t.Title.ToLower().Contains(term)
+                || (t.Description != null && t.Description.ToLower().Contains(term)));
         }
 
         if (query.CategoryId is not null)
