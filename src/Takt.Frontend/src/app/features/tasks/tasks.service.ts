@@ -8,6 +8,8 @@ import { CategoriesService } from '../categories/categories.service';
 
 export type TaskPriority = 'Low' | 'Medium' | 'High';
 
+export type TaskSortField = 'CreatedAt' | 'DueDate' | 'Priority' | 'Title';
+
 export interface Task {
   id: string;
   title: string;
@@ -49,12 +51,19 @@ export class TasksService {
   private readonly pending = new Set<string>();
 
   readonly categoryId = signal<string | null>(null);
+  readonly search = signal('');
+  readonly sortBy = signal<TaskSortField>('Priority');
+  readonly sortDescending = signal(true);
 
   readonly tasks = httpResource<PagedTasks>(() => {
     const params: Record<string, string | boolean> = {
-      sortBy: 'Priority',
-      sortDescending: true,
+      sortBy: this.sortBy(),
+      sortDescending: this.sortDescending(),
     };
+    const search = this.search().trim();
+    if (search) {
+      params['search'] = search;
+    }
     const categoryId = this.categoryId();
     if (categoryId) {
       params['categoryId'] = categoryId;

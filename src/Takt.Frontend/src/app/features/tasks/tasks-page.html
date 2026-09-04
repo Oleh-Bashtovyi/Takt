@@ -3,9 +3,46 @@
 
   <main class="min-w-0 flex-1 px-6 py-8">
     <div class="mx-auto max-w-2xl">
-      <h1 class="text-xl font-semibold text-gray-900">Tasks</h1>
+      <div class="flex items-center gap-2">
+        <input
+          [formControl]="searchControl"
+          type="search"
+          placeholder="Search tasks"
+          class="h-10 min-w-0 flex-1 rounded-md border border-gray-300 px-3 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
+        />
+        <div class="relative shrink-0">
+          <select
+            [value]="tasksService.sortBy()"
+            (change)="setSortField($any($event.target).value)"
+            class="h-10 appearance-none rounded-md border border-gray-300 pr-9 pl-3 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
+            aria-label="Sort by"
+          >
+            @for (field of sortFields; track field.value) {
+              <option [value]="field.value">{{ field.label }}</option>
+            }
+          </select>
+          <app-icon
+            name="chevron"
+            [size]="16"
+            class="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-500"
+          />
+        </div>
+        <button
+          type="button"
+          class="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-gray-300 text-gray-600 transition hover:bg-gray-100"
+          [attr.aria-label]="tasksService.sortDescending() ? 'Sort ascending' : 'Sort descending'"
+          (click)="toggleSortDirection()"
+        >
+          <app-icon
+            name="chevron"
+            [size]="16"
+            class="block transition-transform"
+            [class.rotate-180]="!tasksService.sortDescending()"
+          />
+        </button>
+      </div>
 
-      <app-task-composer class="mt-6 block" />
+      <app-task-composer class="mt-4 block" />
 
       @if (tasks.isLoading() && !tasks.hasValue()) {
         <p class="mt-6 text-sm text-gray-500">Loading…</p>
@@ -21,7 +58,9 @@
           </button>
         </div>
       } @else if (items().length === 0) {
-        <p class="mt-6 text-sm text-gray-500">No tasks yet.</p>
+        <p class="mt-6 text-sm text-gray-500">
+          {{ tasksService.search() ? 'No tasks match your search.' : 'No tasks yet.' }}
+        </p>
       } @else {
         <ul class="mt-6 flex flex-col gap-2">
           @for (task of activeTasks(); track task.id) {
