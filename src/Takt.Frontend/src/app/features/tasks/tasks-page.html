@@ -30,6 +30,7 @@
                 [task]="task"
                 [activeCategoryId]="tasksService.categoryId()"
                 (toggleCompleted)="tasksService.setCompleted(task.id, $event)"
+                (open)="selectedId.set(task.id)"
               />
             </li>
           }
@@ -69,3 +70,7 @@
     </div>
   </main>
 </div>
+
+@if (selectedTask(); as task) {
+  <app-task-detail-drawer [task]="task" (closed)="selectedId.set(null)" />
+}

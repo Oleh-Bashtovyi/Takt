@@ -1,0 +1,124 @@
+<button
+  type="button"
+  class="backdrop fixed inset-0 z-40 cursor-default bg-black/30"
+  aria-label="Close"
+  (click)="closed.emit()"
+></button>
+
+<div
+  class="panel fixed top-0 right-0 z-50 flex h-full w-full max-w-[420px] flex-col bg-white shadow-xl"
+  role="dialog"
+  aria-label="Task details"
+>
+  <div class="flex items-center justify-end border-b border-gray-200 px-5 py-4">
+    <button
+      type="button"
+      class="rounded p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+      aria-label="Close"
+      (click)="closed.emit()"
+    >
+      <app-icon name="x" [size]="18" />
+    </button>
+  </div>
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="save()"
+    class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 py-5"
+  >
+    <label class="flex flex-col gap-1.5">
+      <span class="text-sm font-medium text-gray-700">Title</span>
+      <input
+        formControlName="title"
+        type="text"
+        [attr.maxlength]="limits.titleMax"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
+      />
+    </label>
+
+    <label class="flex flex-col gap-1.5">
+      <span class="text-sm font-medium text-gray-700">Description</span>
+      <textarea
+        formControlName="description"
+        rows="4"
+        [attr.maxlength]="limits.descriptionMax"
+        class="w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
+      ></textarea>
+    </label>
+
+    <label class="flex flex-col gap-1.5">
+      <span class="text-sm font-medium text-gray-700">Priority</span>
+      <select
+        formControlName="priority"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
+      >
+        @for (priority of priorities; track priority) {
+          <option [value]="priority">{{ priority }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="flex flex-col gap-1.5">
+      <span class="text-sm font-medium text-gray-700">Due date</span>
+      <input
+        formControlName="dueDate"
+        type="date"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
+      />
+    </label>
+
+    <label class="flex flex-col gap-1.5">
+      <span class="text-sm font-medium text-gray-700">List</span>
+      <select
+        formControlName="categoryId"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
+      >
+        <option value="">No list</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </label>
+
+    <button
+      type="submit"
+      [disabled]="form.invalid || saving()"
+      class="mt-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-700 disabled:opacity-50"
+    >
+      Save
+    </button>
+  </form>
+
+  <div class="border-t border-gray-200 px-5 py-4">
+    @if (confirmingDelete()) {
+      <div class="flex items-center justify-between gap-3">
+        <span class="text-sm text-gray-700">Delete this task?</span>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-red-700"
+            (click)="remove()"
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-900 transition hover:bg-gray-100"
+            (click)="confirmingDelete.set(false)"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    } @else {
+      <button
+        type="button"
+        class="flex items-center gap-1.5 text-sm font-medium text-red-600 transition hover:text-red-700"
+        (click)="confirmingDelete.set(true)"
+      >
+        <app-icon name="trash" [size]="16" />
+        Delete task
+      </button>
+    }
+  </div>
+</div>

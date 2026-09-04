@@ -1,6 +1,6 @@
-import { HttpClient, httpResource } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, httpResource } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, tap, throwError } from 'rxjs';
 import { API_ENDPOINTS } from '../../constants/api.constants';
 import { environment } from '../../../environments/environment';
 import { NotificationService } from '../../core/notifications/notification.service';
@@ -20,6 +20,14 @@ export interface Task {
   completedAtUtc: string | null;
   createdAtUtc: string;
   updatedAtUtc: string;
+}
+
+export interface TaskEdit {
+  title: string;
+  description: string | null;
+  priority: TaskPriority;
+  dueDateUtc: string | null;
+  categoryId: string | null;
 }
 
 export interface PagedTasks {
@@ -69,6 +77,34 @@ export class TasksService {
           this.categoriesService.categories.reload();
         }),
       );
+  }
+
+  update(id: string, edit: TaskEdit): Observable<Task> {
+    return this.http.put<Task>(`${this.baseUrl}/${id}`, edit).pipe(
+      tap((updated) => {
+        this.applyLocal(id, updated);
+        this.categoriesService.categories.reload();
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.notifications.error('Could not save the task.');
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  remove(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => {
+        this.tasks.update((page) =>
+          page ? { ...page, items: page.items.filter((task) => task.id !== id) } : page,
+        );
+        this.categoriesService.categories.reload();
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.notifications.error('Could not delete the task.');
+        return throwError(() => error);
+      }),
+    );
   }
 
   setCompleted(id: string, isCompleted: boolean): void {

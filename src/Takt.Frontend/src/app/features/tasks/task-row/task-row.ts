@@ -18,6 +18,7 @@ export class TaskRow {
   readonly task = input.required<Task>();
   readonly activeCategoryId = input<string | null>(null);
   readonly toggleCompleted = output<boolean>();
+  readonly open = output<void>();
 
   protected readonly accent = PRIORITY_ACCENT;
 

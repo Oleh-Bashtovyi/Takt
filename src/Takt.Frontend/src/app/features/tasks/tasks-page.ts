@@ -4,12 +4,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Icon } from '../../shared/components/icon/icon';
 import { CategorySidebar } from '../categories/category-sidebar/category-sidebar';
 import { TaskComposer } from './task-composer/task-composer';
+import { TaskDetailDrawer } from './task-detail-drawer/task-detail-drawer';
 import { TaskRow } from './task-row/task-row';
 import { TasksService } from './tasks.service';
 
 @Component({
   selector: 'app-tasks-page',
-  imports: [CategorySidebar, TaskComposer, TaskRow, Icon],
+  imports: [CategorySidebar, TaskComposer, TaskDetailDrawer, TaskRow, Icon],
   templateUrl: './tasks-page.html',
 })
 export class TasksPage {
@@ -23,8 +24,12 @@ export class TasksPage {
   }
 
   protected readonly showCompleted = signal(true);
+  protected readonly selectedId = signal<string | null>(null);
 
   protected readonly items = computed(() => this.tasks.value()?.items ?? []);
+  protected readonly selectedTask = computed(
+    () => this.items().find((task) => task.id === this.selectedId()) ?? null,
+  );
   protected readonly activeTasks = computed(() => this.items().filter((task) => !task.isCompleted));
   protected readonly completedTasks = computed(() =>
     this.items().filter((task) => task.isCompleted),
