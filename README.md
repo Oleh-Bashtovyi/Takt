@@ -56,12 +56,17 @@ The API reads `Takt.API/.env` in Development (via `DotNetEnv`). Apply migrations
 ```bash
 dotnet ef database update --project src/Takt.Backend/Takt.Infrastructure --startup-project src/Takt.Backend/Takt.API
 # or
-dotnet run --project src/Takt.Backend/Takt.DbMigrator -- --seed
+dotnet run --project src/Takt.Backend/Takt.DbMigrator -- seed-data
 ```
+
+The migrator always applies migrations; pass `seed-data` to also seed the demo data.
+In Visual Studio the `Takt.DbMigrator` project has **Migrate** and **Migrate and seed** launch profiles.
 
 ### Demo account
 
-Seeded when the migrator runs with `--seed`: `demo@takt.local` / `Password1`.
+Seeded when the migrator runs with `seed-data`: `demo@takt.local` / `Password1` —
+three categories (one with a couple of tasks, one with 25 and a deliberately long name,
+one with 105 for pagination).
 
 ## API
 

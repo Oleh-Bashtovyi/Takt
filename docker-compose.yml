@@ -23,7 +23,7 @@ services:
       dockerfile: Takt.DbMigrator/Dockerfile
     profiles: ["apps"]
     restart: "no"
-    command: ["--seed"]
+    command: ["seed-data"]
     environment:
       ConnectionStrings__Default: "Server=db;Database=Takt;User Id=sa;Password=Takt_local_Passw0rd!;TrustServerCertificate=True;Encrypt=False"
     depends_on:

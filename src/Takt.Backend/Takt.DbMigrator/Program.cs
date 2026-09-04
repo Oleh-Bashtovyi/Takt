@@ -7,6 +7,12 @@ using Takt.DbMigrator;
 using Takt.Infrastructure;
 using Takt.Infrastructure.Persistence;
 
+// A bare "seed-data" arg triggers the dev seeder; strip it so the config providers,
+// which only understand "--key value" pairs, don't choke on it.
+const string SeedArg = "seed-data";
+var shouldSeed = args.Contains(SeedArg);
+var hostArgs = args.Where(arg => arg != SeedArg).ToArray();
+
 // Reuse Takt.API's configuration so the connection string lives in one place.
 var apiDirectory = ResolveApiDirectory();
 
@@ -17,13 +23,13 @@ if (File.Exists(envFile))
     DotNetEnv.Env.NoClobber().Load(envFile);
 }
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = Host.CreateApplicationBuilder(hostArgs);
 
 builder.Configuration
     .AddJsonFile(Path.Combine(apiDirectory, "appsettings.json"), optional: true)
     .AddJsonFile(Path.Combine(apiDirectory, $"appsettings.{builder.Environment.EnvironmentName}.json"), optional: true)
     .AddEnvironmentVariables()
-    .AddCommandLine(args);
+    .AddCommandLine(hostArgs);
 
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddScoped<DevDataSeeder>();
@@ -42,7 +48,7 @@ try
     await database.MigrateAsync();
     logger.LogInformation("Migrations applied.");
 
-    if (args.Contains("--seed"))
+    if (shouldSeed)
     {
         await services.GetRequiredService<DevDataSeeder>().SeedAsync();
     }
