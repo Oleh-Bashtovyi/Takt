@@ -1,6 +1,8 @@
+<!-- Marketing site header -->
 <header class="border-b border-gray-200 bg-white">
   <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
     <app-logo-group />
+    <!-- Right: account link when signed in, otherwise Log in -->
     <nav>
       @if (user(); as user) {
         <a

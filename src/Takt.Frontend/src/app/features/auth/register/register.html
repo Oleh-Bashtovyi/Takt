@@ -1,9 +1,12 @@
 <app-auth-card title="Create your account" subtitle="Start organising your tasks with Takt">
+  <!-- Register form -->
   <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-3">
+    <!-- Form-level error -->
     @if (formError(); as error) {
       <p class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>
     }
 
+    <!-- Fields -->
     <app-text-input
       [control]="form.controls.displayName"
       label="Display name (optional)"
@@ -23,6 +26,7 @@
       autocomplete="new-password"
       hint="At least 8 characters"
     />
+    <!-- Confirm password + cross-field mismatch error -->
     <div>
       <app-password-input
         [control]="form.controls.confirmPassword"
@@ -33,6 +37,7 @@
         <p class="text-xs text-red-600">Passwords do not match</p>
       }
     </div>
+    <!-- Submit -->
     <button
       type="submit"
       [disabled]="submitting()"
@@ -42,6 +47,7 @@
     </button>
   </form>
 
+  <!-- Link to login -->
   <p class="mt-6 text-center text-sm text-gray-500">
     Already have an account?
     <a [routerLink]="routes.login" class="font-medium text-gray-900 hover:underline">Log in</a>

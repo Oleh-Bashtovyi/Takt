@@ -1,5 +1,7 @@
+<!-- Centered auth card (shell for the login / register forms) -->
 <div class="flex min-h-screen items-center justify-center p-4">
   <div class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
+    <!-- Card header: logo + title + subtitle -->
     <div class="mb-8 flex flex-col items-center text-center">
       <app-logo-group />
       <h1 class="mt-4 text-2xl font-bold text-gray-900">{{ title() }}</h1>
@@ -7,6 +9,7 @@
         <p class="mt-2 text-sm text-gray-500">{{ subtitle }}</p>
       }
     </div>
+    <!-- Projected form -->
     <ng-content />
   </div>
 </div>

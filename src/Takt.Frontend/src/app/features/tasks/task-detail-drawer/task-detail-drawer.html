@@ -1,3 +1,4 @@
+<!-- Backdrop (click to close) -->
 <button
   type="button"
   class="backdrop fixed inset-0 z-40 cursor-default bg-black/30"
@@ -5,11 +6,13 @@
   (click)="closed.emit()"
 ></button>
 
+<!-- Drawer panel (slides in from the right) -->
 <div
   class="panel fixed top-0 right-0 z-50 flex h-full w-full max-w-[420px] flex-col bg-white shadow-xl"
   role="dialog"
   aria-label="Task details"
 >
+  <!-- Header: close button -->
   <div class="flex items-center justify-end border-b border-gray-200 px-5 py-4">
     <button
       type="button"
@@ -21,6 +24,7 @@
     </button>
   </div>
 
+  <!-- Edit form: title / description / priority / due date / list, then Save -->
   <form
     [formGroup]="form"
     (ngSubmit)="save()"
@@ -80,6 +84,7 @@
       </select>
     </label>
 
+    <!-- Save -->
     <button
       type="submit"
       [disabled]="form.invalid || saving()"
@@ -89,6 +94,7 @@
     </button>
   </form>
 
+  <!-- Footer: delete task (inline confirm) -->
   <div class="border-t border-gray-200 px-5 py-4">
     @if (confirmingDelete()) {
       <div class="flex items-center justify-between gap-3">

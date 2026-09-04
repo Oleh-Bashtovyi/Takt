@@ -1,4 +1,6 @@
+<!-- Add task form: title input + submit -->
 <form [formGroup]="form" (ngSubmit)="submit()" class="flex items-center gap-2">
+  <!-- Title input -->
   <input
     formControlName="title"
     type="text"
@@ -7,6 +9,7 @@
     [attr.maxlength]="limits.titleMax"
     class="h-10 min-w-0 flex-1 rounded-md border border-gray-300 px-3 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
   />
+  <!-- Submit -->
   <button
     type="submit"
     [disabled]="submitting()"
