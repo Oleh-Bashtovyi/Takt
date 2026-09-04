@@ -1,3 +1,4 @@
+<!-- Task row: whole row opens the drawer; left border colour = priority -->
 <div
   class="flex cursor-pointer items-start gap-3 rounded-md border border-gray-200 border-l-4 bg-white px-4 py-3 transition hover:bg-gray-50"
   [class]="accent[task().priority]"
@@ -6,6 +7,7 @@
   (click)="open.emit()"
   (keydown.enter)="open.emit()"
 >
+  <!-- Completion checkbox -->
   <button
     type="button"
     class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-white transition"
@@ -23,6 +25,7 @@
   </button>
 
   <div class="min-w-0 flex-1">
+    <!-- Title line: title + category chip + due date -->
     <div class="flex items-start gap-3">
       <span
         class="min-w-0 flex-1 text-sm text-gray-900"
@@ -32,10 +35,17 @@
         {{ task().title }}
       </span>
 
+      <!-- Category chip (hidden when it matches the active filter) -->
       @if (showCategory()) {
-        <span class="mt-0.5 shrink-0 text-xs text-gray-400">{{ task().categoryName }}</span>
+        <span
+          [title]="task().categoryName"
+          class="mt-0.5 max-w-[8rem] shrink-0 truncate text-xs text-gray-400"
+        >
+          {{ task().categoryName }}
+        </span>
       }
 
+      <!-- Due date (red + icon when overdue) -->
       @if (task().dueDateUtc; as due) {
         <span
           class="mt-0.5 flex shrink-0 items-center gap-1 text-xs"
@@ -50,6 +60,7 @@
       }
     </div>
 
+    <!-- Description preview (one line) -->
     @if (task().description; as description) {
       <p class="mt-0.5 truncate text-xs text-gray-400">{{ description }}</p>
     }

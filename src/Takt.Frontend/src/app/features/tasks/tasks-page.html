@@ -1,15 +1,21 @@
-<div class="flex min-h-[calc(100dvh-3.5rem)]">
-  <app-category-sidebar />
+<!-- Category sidebar (scrolls on its own) -->
+<app-category-sidebar />
 
-  <main class="min-w-0 flex-1 px-6 py-8">
-    <div class="mx-auto max-w-2xl">
+<!-- Working area -->
+<main class="flex min-w-0 flex-1 flex-col overflow-hidden">
+  <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden px-6">
+    <!-- Pinned toolbar (stays put while the list below scrolls) -->
+    <div class="shrink-0 pt-8 pb-4">
+      <!-- Search + sort row -->
       <div class="flex items-center gap-2">
+        <!-- Search input -->
         <input
           [formControl]="searchControl"
           type="search"
           placeholder="Search tasks"
           class="h-10 min-w-0 flex-1 rounded-md border border-gray-300 px-3 text-sm outline-none transition focus:ring-2 focus:ring-gray-900"
         />
+        <!-- Sort field -->
         <div class="relative shrink-0">
           <select
             [value]="tasksService.sortBy()"
@@ -27,6 +33,7 @@
             class="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-500"
           />
         </div>
+        <!-- Sort direction toggle -->
         <button
           type="button"
           class="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-gray-300 text-gray-600 transition hover:bg-gray-100"
@@ -42,12 +49,46 @@
         </button>
       </div>
 
+      <!-- Add task line -->
       <app-task-composer class="mt-4 block" />
 
+      <!-- Active / Completed tabs -->
+      <div class="mt-4 flex gap-4 border-b border-gray-200 text-sm">
+        <button
+          type="button"
+          class="-mb-px border-b-2 py-2 font-medium transition"
+          [class.border-gray-900]="!tasksService.completed()"
+          [class.text-gray-900]="!tasksService.completed()"
+          [class.border-transparent]="tasksService.completed()"
+          [class.text-gray-500]="tasksService.completed()"
+          [class.hover:text-gray-900]="tasksService.completed()"
+          (click)="setTab(false)"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          class="-mb-px border-b-2 py-2 font-medium transition"
+          [class.border-gray-900]="tasksService.completed()"
+          [class.text-gray-900]="tasksService.completed()"
+          [class.border-transparent]="!tasksService.completed()"
+          [class.text-gray-500]="!tasksService.completed()"
+          [class.hover:text-gray-900]="!tasksService.completed()"
+          (click)="setTab(true)"
+        >
+          Completed
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable task container -->
+    <div class="min-h-0 flex-1 overflow-y-auto pb-8">
       @if (tasks.isLoading() && !tasks.hasValue()) {
-        <p class="mt-6 text-sm text-gray-500">Loading…</p>
+        <!-- Loading state -->
+        <p class="text-sm text-gray-500">Loading…</p>
       } @else if (tasks.error()) {
-        <div class="mt-6 flex flex-col items-start gap-2">
+        <!-- Error state -->
+        <div class="flex flex-col items-start gap-2">
           <p class="text-sm text-red-600">Could not load your tasks.</p>
           <button
             type="button"
@@ -58,12 +99,20 @@
           </button>
         </div>
       } @else if (items().length === 0) {
-        <p class="mt-6 text-sm text-gray-500">
-          {{ tasksService.search() ? 'No tasks match your search.' : 'No tasks yet.' }}
+        <!-- Empty state -->
+        <p class="text-sm text-gray-500">
+          @if (tasksService.search()) {
+            No tasks match your search.
+          } @else if (tasksService.completed()) {
+            No completed tasks.
+          } @else {
+            No tasks yet.
+          }
         </p>
       } @else {
-        <ul class="mt-6 flex flex-col gap-2">
-          @for (task of activeTasks(); track task.id) {
+        <!-- Task list -->
+        <ul class="flex flex-col gap-2">
+          @for (task of items(); track task.id) {
             <li>
               <app-task-row
                 [task]="task"
@@ -75,41 +124,58 @@
           }
         </ul>
 
-        @if (completedTasks().length > 0) {
-          <button
-            type="button"
-            class="mt-6 flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-700"
-            (click)="showCompleted.set(!showCompleted())"
-          >
-            <app-icon
-              name="chevron"
-              [size]="16"
-              class="inline-block transition-transform"
-              [class.-rotate-90]="!showCompleted()"
-            />
-            Completed
-            <span class="text-gray-400">{{ completedTasks().length }}</span>
-          </button>
+        <!-- Pagination bar -->
+        @if (totalPages() > 1) {
+          <nav class="mt-6 flex items-center justify-center gap-1 text-sm">
+            <!-- Previous page -->
+            <button
+              type="button"
+              class="grid h-8 w-8 place-items-center rounded-md text-gray-600 transition hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent"
+              [disabled]="!tasks.value()?.hasPrevious"
+              aria-label="Previous page"
+              (click)="goToPage(tasksService.page() - 1)"
+            >
+              <app-icon name="chevron" [size]="16" class="block rotate-90" />
+            </button>
 
-          @if (showCompleted()) {
-            <ul class="mt-2 flex flex-col gap-2">
-              @for (task of completedTasks(); track task.id) {
-                <li>
-                  <app-task-row
-                    [task]="task"
-                    [activeCategoryId]="tasksService.categoryId()"
-                    (toggleCompleted)="tasksService.setCompleted(task.id, $event)"
-                  />
-                </li>
+            <!-- Page numbers (with … for gaps) -->
+            @for (entry of pageNumbers(); track $index) {
+              @if (entry === '…') {
+                <span class="px-1 text-gray-400">…</span>
+              } @else {
+                <button
+                  type="button"
+                  class="grid h-8 min-w-8 place-items-center rounded-md px-1.5 font-medium transition"
+                  [class.bg-gray-900]="entry === tasksService.page()"
+                  [class.text-white]="entry === tasksService.page()"
+                  [class.text-gray-600]="entry !== tasksService.page()"
+                  [class.hover:bg-gray-100]="entry !== tasksService.page()"
+                  [attr.aria-current]="entry === tasksService.page() ? 'page' : null"
+                  (click)="goToPage(entry)"
+                >
+                  {{ entry }}
+                </button>
               }
-            </ul>
-          }
+            }
+
+            <!-- Next page -->
+            <button
+              type="button"
+              class="grid h-8 w-8 place-items-center rounded-md text-gray-600 transition hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent"
+              [disabled]="!tasks.value()?.hasNext"
+              aria-label="Next page"
+              (click)="goToPage(tasksService.page() + 1)"
+            >
+              <app-icon name="chevron" [size]="16" class="block -rotate-90" />
+            </button>
+          </nav>
         }
       }
     </div>
-  </main>
-</div>
+  </div>
+</main>
 
+<!-- Task detail drawer (opens when a row is clicked) -->
 @if (selectedTask(); as task) {
   <app-task-detail-drawer [task]="task" (closed)="selectedId.set(null)" />
 }

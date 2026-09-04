@@ -6,6 +6,7 @@ import { AuthService } from '../../core/auth/auth.service';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.html',
+  host: { class: 'min-w-0 flex-1 overflow-y-auto' },
 })
 export class Profile {
   private readonly auth = inject(AuthService);

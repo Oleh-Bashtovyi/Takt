@@ -11,6 +11,7 @@ import { LogoGroup } from '../logo-group/logo-group';
   selector: 'app-workspace-header',
   imports: [RouterLink, LogoGroup],
   templateUrl: './workspace-header.html',
+  host: { class: 'block shrink-0' },
 })
 export class WorkspaceHeader {
   private readonly router = inject(Router);

@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse, httpResource } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { API_ENDPOINTS } from '../../constants/api.constants';
 import { environment } from '../../../environments/environment';
@@ -45,6 +46,7 @@ export interface PagedTasks {
 @Injectable({ providedIn: 'root' })
 export class TasksService {
   private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
   private readonly notifications = inject(NotificationService);
   private readonly categoriesService = inject(CategoriesService);
   private readonly baseUrl = `${environment.apiBaseUrl}${API_ENDPOINTS.tasks}`;
@@ -54,9 +56,13 @@ export class TasksService {
   readonly search = signal('');
   readonly sortBy = signal<TaskSortField>('Priority');
   readonly sortDescending = signal(true);
+  readonly completed = signal(false);
+  readonly page = signal(1);
 
   readonly tasks = httpResource<PagedTasks>(() => {
-    const params: Record<string, string | boolean> = {
+    const params: Record<string, string | number | boolean> = {
+      isCompleted: this.completed(),
+      page: this.page(),
       sortBy: this.sortBy(),
       sortDescending: this.sortDescending(),
     };
@@ -82,6 +88,10 @@ export class TasksService {
       })
       .pipe(
         tap(() => {
+          this.router.navigate([], {
+            queryParams: { tab: null, page: null },
+            queryParamsHandling: 'merge',
+          });
           this.tasks.reload();
           this.categoriesService.categories.reload();
         }),
@@ -107,6 +117,7 @@ export class TasksService {
         this.tasks.update((page) =>
           page ? { ...page, items: page.items.filter((task) => task.id !== id) } : page,
         );
+        this.tasks.reload();
         this.categoriesService.categories.reload();
       }),
       catchError((error: HttpErrorResponse) => {
@@ -129,10 +140,14 @@ export class TasksService {
     this.http.patch<Task>(`${this.baseUrl}/${id}/completion`, { isCompleted }).subscribe({
       next: (updated) => {
         this.pending.delete(id);
-        this.applyLocal(id, {
-          isCompleted: updated.isCompleted,
-          completedAtUtc: updated.completedAtUtc,
-        });
+        if (updated.isCompleted === this.completed()) {
+          this.applyLocal(id, {
+            isCompleted: updated.isCompleted,
+            completedAtUtc: updated.completedAtUtc,
+          });
+        } else {
+          this.tasks.reload();
+        }
       },
       error: () => {
         this.pending.delete(id);
